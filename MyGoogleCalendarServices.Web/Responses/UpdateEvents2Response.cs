@@ -8,29 +8,18 @@
     public class UpdateEvents2Response
     {
         public string Status { get; set; }
-        public int StatusId { get; set; }
+        public string StatusId { get; set; }
         public List<string> ValidationErrors { get; set; }
-        public string GoogleId { get; set; }
+        //public string GoogleId { get; set; }
         public string AppId { get; set; }
-        public void SetStatus(int StatusId, string StatusMessage, Exception ex = null)
-        {
-            this.Status = StatusMessage;
-            this.StatusId = StatusId;
-            if (ex != null)
-            {
-                this.Status += Environment.NewLine + ex.Message;
-                System.Threading.Tasks.Task.Factory.StartNew(WriteException, ex);
-            }
-        }
         public List<EmailEntry> Results { get; set; }
         public UpdateEvents2Response()
         {
             ValidationErrors = new List<string>();
             Results = new List<EmailEntry>();
             this.AppId = string.Empty;
-            this.GoogleId = string.Empty;
-            this.Status = "אותחל";
-            this.StatusId = 0;
+            this.Status = "לא נמצאו תקלות, יש לבדוק סטאטוס ברמת נמענים";
+            this.StatusId = StatusCodes.noErrors;
         }
         private void WriteException(object ex)
         {
@@ -59,22 +48,26 @@
 
             }
         }
-        internal void SetFailed(string message)
+        internal void SetFailed(string statusCode, string message)
+        {
+            SetFailed(statusCode, message, null, null);
+        }
+        internal void SetFailed(string statusCode, string message, ModelStateDictionary modelState = null, Exception ex = null)
         {
             Status = message;
-            StatusId = -2;
-        }
-        internal void SetFailed(ModelStateDictionary modelState)
-        {
+            StatusId = statusCode;
             if (modelState == null) return;
-            Status = "שגיאות וולידציה";
-            StatusId = -2;
             foreach (var item in modelState)
             {
                 foreach (var errorMessage in item.Value.Errors)
                 {
                     ValidationErrors.Add(string.Format("{0} : {1}", item.Key, errorMessage.ErrorMessage));
                 }
+            }
+            if (ex != null)
+            {
+                this.Status += Environment.NewLine + ex.Message;
+                System.Threading.Tasks.Task.Factory.StartNew(WriteException, ex);
             }
         }
     }
