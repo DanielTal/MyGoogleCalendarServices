@@ -20,6 +20,7 @@ namespace MyGoogleCalendarServices.Web.DataAccess
         public string Email { get; set; }
         public System.DateTime CreateDate { get; set; }
         public System.DateTime UpdateDate { get; set; }
+        public string Status { get; set; }
     
         public virtual Event Event { get; set; }
     }

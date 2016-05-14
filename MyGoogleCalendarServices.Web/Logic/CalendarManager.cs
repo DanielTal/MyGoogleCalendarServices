@@ -207,12 +207,12 @@ namespace MyGoogleCalendarServices.Web.Logic
                     UpdateDate = DateTime.Now,
                 });
                 db1.SaveChanges();
-                response.Results.Add(new EmailEntry { Action = "create", Email = email.Email, Status = "אירוע נוצר בהצלחה" });
+                response.Results.Add(new EmailEntry { StatusId = "create", Email = email.Email, Status = "אירוע נוצר בהצלחה" });
             }
             catch(Exception ex)
             {
                 LogError(ex);
-                response.Results.Add(new EmailEntry { Action = "create", Email = email.Email, Status = "תקלה ברישום אירוע לנמען" });
+                response.Results.Add(new EmailEntry { StatusId = "create", Email = email.Email, Status = "תקלה ברישום אירוע לנמען" });
             }
         }
         private void LogError(Exception ex)
@@ -235,14 +235,14 @@ namespace MyGoogleCalendarServices.Web.Logic
             try
             {
                 var deletedEvent = service.Events.Delete(attendee.Email, attendee.GoogleId).Execute();
-                response.Results.Add(new EmailEntry { Action = "delete", Email = attendee.Email, Status = "אירוע נמחק בהצלחה" });
+                response.Results.Add(new EmailEntry { StatusId = "delete", Email = attendee.Email, Status = "אירוע נמחק בהצלחה" });
                 db1.EventsAttendees.Remove(attendee);
                 db1.SaveChanges();
             }
             catch(Exception ex)
             {
                 LogError(ex);
-                response.Results.Add(new EmailEntry { Action = "delete", Email = attendee.Email, Status = "כשל במחיקת אירוע, ייתכן שהאירוע נמחק כבר על ידי המשתמש" });
+                response.Results.Add(new EmailEntry { StatusId = "delete", Email = attendee.Email, Status = "כשל במחיקת אירוע, ייתכן שהאירוע נמחק כבר על ידי המשתמש" });
             }
         }
 
@@ -290,12 +290,12 @@ namespace MyGoogleCalendarServices.Web.Logic
                 event1.End = new EventDateTime { DateTime = request.EndTimeObj };
                 event1.ColorId = request.ColorId;
                 var result = service.Events.Update(event1, attendeeRec.Email, attendeeRec.GoogleId).Execute();
-                response.Results.Add(new EmailEntry { Action = "update", Email = attendeeRec.Email, Status = "אירוע עודכן בהצלחה" });
+                response.Results.Add(new EmailEntry { StatusId = "update", Email = attendeeRec.Email, Status = "אירוע עודכן בהצלחה" });
             }
             catch(Exception ex)
             {
                 LogError(ex);
-                response.Results.Add(new EmailEntry { Action = "update", Email = attendeeRec.Email, Status = "כשל בעדכון אירוע, ייתכן שהמשתמש כבר מחק את האירוע" });
+                response.Results.Add(new EmailEntry { StatusId = "update", Email = attendeeRec.Email, Status = "כשל בעדכון אירוע, ייתכן שהמשתמש כבר מחק את האירוע" });
             }
         }
         //private void UpdateEvent(UpdateEvents2Request request, UpdateEvents2Response response)

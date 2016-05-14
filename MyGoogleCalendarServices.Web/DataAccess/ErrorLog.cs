@@ -16,5 +16,9 @@ namespace MyGoogleCalendarServices.Web.DataAccess
     {
         public long Id { get; set; }
         public string ExceptionMessage { get; set; }
+        public string Info { get; set; }
+        public System.DateTime CreateDate { get; set; }
+        public string AppId { get; set; }
+        public string email { get; set; }
     }
 }

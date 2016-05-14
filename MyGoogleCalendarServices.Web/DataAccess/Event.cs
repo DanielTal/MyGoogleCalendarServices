@@ -24,6 +24,7 @@ namespace MyGoogleCalendarServices.Web.DataAccess
         public string Summary { get; set; }
         public System.DateTime CreatedDate { get; set; }
         public System.DateTime UpdateDate { get; set; }
+        public string Status { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<EventsAttendee> EventsAttendees { get; set; }
