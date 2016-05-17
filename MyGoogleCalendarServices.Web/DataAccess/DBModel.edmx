@@ -9,7 +9,7 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="ExceptionMessage" Type="nvarchar" MaxLength="4000" Nullable="false" />
           <Property Name="Info" Type="nvarchar" MaxLength="256" Nullable="false" />
           <Property Name="AppId" Type="nvarchar" MaxLength="14" Nullable="false" />
@@ -20,9 +20,16 @@
           <Key>
             <PropertyRef Name="AppId" />
           </Key>
-          <Property Name="AppId" Type="nvarchar" MaxLength="14" Nullable="false" />
+          <Property Name="AppId" Type="nchar" MaxLength="14" Nullable="false" />
           <Property Name="Summary" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="Status" Type="nvarchar" MaxLength="16" Nullable="false" />
+          <Property Name="SoftClientNum" Type="int" Nullable="false" />
+          <Property Name="SoftDbNum" Type="smallint" Nullable="false" />
+          <Property Name="Location" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="512" Nullable="false" />
+          <Property Name="ColorId" Type="smallint" Nullable="false" />
+          <Property Name="StartTime" Type="datetime" Nullable="false" />
+          <Property Name="EndTime" Type="datetime" Nullable="false" />
           <Property Name="CreatedDate" Type="datetime" Nullable="false" />
           <Property Name="UpdateDate" Type="datetime" Nullable="false" />
         </EntityType>
@@ -30,8 +37,8 @@
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="EventAppId" Type="nvarchar" MaxLength="14" Nullable="false" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="EventAppId" Type="nchar" MaxLength="14" Nullable="false" />
           <Property Name="GoogleId" Type="nvarchar" MaxLength="1024" Nullable="false" />
           <Property Name="Email" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="Status" Type="nvarchar" MaxLength="32" Nullable="false" />
@@ -65,102 +72,116 @@
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="DBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityType Name="Event">
-          <Key>
-            <PropertyRef Name="AppId" />
-          </Key>
-          <Property Name="AppId" Type="String" MaxLength="14" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Summary" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="EventsAttendees" Relationship="Self.FK_EventsAttendees_Events" FromRole="Events" ToRole="EventsAttendees" />
-          <Property Name="Status" Type="String" Nullable="false" MaxLength="16" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <EntityType Name="EventsAttendee">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="EventAppId" Type="String" MaxLength="14" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="GoogleId" Type="String" MaxLength="1024" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Email" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
-          <NavigationProperty Name="Event" Relationship="Self.FK_EventsAttendees_Events" FromRole="EventsAttendees" ToRole="Events" />
-          <Property Name="CreateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="Status" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="true" />
-        </EntityType>
-        <Association Name="FK_EventsAttendees_Events">
-          <End Role="Events" Type="Self.Event" Multiplicity="1">
-            <OnDelete Action="Cascade" />
-          </End>
-          <End Role="EventsAttendees" Type="Self.EventsAttendee" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Events">
-              <PropertyRef Name="AppId" />
-            </Principal>
-            <Dependent Role="EventsAttendees">
-              <PropertyRef Name="EventAppId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityContainer Name="DBEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="Events" EntityType="Self.Event" />
-          <EntitySet Name="EventsAttendees" EntityType="Self.EventsAttendee" />
-          <AssociationSet Name="FK_EventsAttendees_Events" Association="Self.FK_EventsAttendees_Events">
-            <End Role="Events" EntitySet="Events" />
-            <End Role="EventsAttendees" EntitySet="EventsAttendees" />
-          </AssociationSet>
           <EntitySet Name="ErrorLogs" EntityType="DBModel.ErrorLog" />
+          <EntitySet Name="Events" EntityType="DBModel.Event" />
+          <EntitySet Name="EventsAttendees" EntityType="DBModel.EventsAttendee" />
+          <AssociationSet Name="FK_EventsAttendees_Events" Association="DBModel.FK_EventsAttendees_Events">
+            <End Role="Event" EntitySet="Events" />
+            <End Role="EventsAttendee" EntitySet="EventsAttendees" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="ErrorLog">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="ExceptionMessage" Type="String" Nullable="false" MaxLength="4000" FixedLength="false" Unicode="true" />
           <Property Name="Info" Type="String" Nullable="false" MaxLength="256" FixedLength="false" Unicode="true" />
-          <Property Name="CreateDate" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="AppId" Type="String" Nullable="false" MaxLength="14" FixedLength="false" Unicode="true" />
           <Property Name="email" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="CreateDate" Type="DateTime" Nullable="false" Precision="3" />
         </EntityType>
+        <EntityType Name="Event">
+          <Key>
+            <PropertyRef Name="AppId" />
+          </Key>
+          <Property Name="AppId" Type="String" Nullable="false" MaxLength="14" FixedLength="true" Unicode="true" />
+          <Property Name="Summary" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="Status" Type="String" Nullable="false" MaxLength="16" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="EventsAttendees" Relationship="DBModel.FK_EventsAttendees_Events" FromRole="Event" ToRole="EventsAttendee" />
+          <Property Name="SoftClientNum" Type="Int32" Nullable="false" />
+          <Property Name="SoftDbNum" Type="Int16" Nullable="false" />
+          <Property Name="Location" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="512" FixedLength="false" Unicode="true" />
+          <Property Name="ColorId" Type="Int16" Nullable="false" />
+          <Property Name="StartTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="EndTime" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="EventsAttendee">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="EventAppId" Type="String" Nullable="false" MaxLength="14" FixedLength="true" Unicode="true" />
+          <Property Name="GoogleId" Type="String" Nullable="false" MaxLength="1024" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" Nullable="false" MaxLength="128" FixedLength="false" Unicode="true" />
+          <Property Name="Status" Type="String" Nullable="false" MaxLength="32" FixedLength="false" Unicode="true" />
+          <Property Name="CreateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdateDate" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Event" Relationship="DBModel.FK_EventsAttendees_Events" FromRole="EventsAttendee" ToRole="Event" />
+        </EntityType>
+        <Association Name="FK_EventsAttendees_Events">
+          <End Type="DBModel.Event" Role="Event" Multiplicity="1">
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Type="DBModel.EventsAttendee" Role="EventsAttendee" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Event">
+              <PropertyRef Name="AppId" />
+            </Principal>
+            <Dependent Role="EventsAttendee">
+              <PropertyRef Name="EventAppId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="DBModelStoreContainer" CdmEntityContainer="DBEntities">
+          <EntitySetMapping Name="ErrorLogs">
+            <EntityTypeMapping TypeName="DBModel.ErrorLog">
+              <MappingFragment StoreEntitySet="ErrorLog">
+                <ScalarProperty Name="CreateDate" ColumnName="CreateDate" />
+                <ScalarProperty Name="email" ColumnName="email" />
+                <ScalarProperty Name="AppId" ColumnName="AppId" />
+                <ScalarProperty Name="Info" ColumnName="Info" />
+                <ScalarProperty Name="ExceptionMessage" ColumnName="ExceptionMessage" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Events">
             <EntityTypeMapping TypeName="DBModel.Event">
               <MappingFragment StoreEntitySet="Events">
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="AppId" ColumnName="AppId" />
-                <ScalarProperty Name="Summary" ColumnName="Summary" />
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="EndTime" ColumnName="EndTime" />
+                <ScalarProperty Name="StartTime" ColumnName="StartTime" />
+                <ScalarProperty Name="ColorId" ColumnName="ColorId" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="Location" ColumnName="Location" />
+                <ScalarProperty Name="SoftDbNum" ColumnName="SoftDbNum" />
+                <ScalarProperty Name="SoftClientNum" ColumnName="SoftClientNum" />
                 <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Summary" ColumnName="Summary" />
+                <ScalarProperty Name="AppId" ColumnName="AppId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="EventsAttendees">
             <EntityTypeMapping TypeName="DBModel.EventsAttendee">
               <MappingFragment StoreEntitySet="EventsAttendees">
-                <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
                 <ScalarProperty Name="CreateDate" ColumnName="CreateDate" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-                <ScalarProperty Name="EventAppId" ColumnName="EventAppId" />
-                <ScalarProperty Name="GoogleId" ColumnName="GoogleId" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="Email" ColumnName="Email" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="ErrorLogs">
-            <EntityTypeMapping TypeName="DBModel.ErrorLog">
-              <MappingFragment StoreEntitySet="ErrorLog">
-                <ScalarProperty Name="email" ColumnName="email" />
-                <ScalarProperty Name="AppId" ColumnName="AppId" />
-                <ScalarProperty Name="CreateDate" ColumnName="CreateDate" />
-                <ScalarProperty Name="Info" ColumnName="Info" />
-                <ScalarProperty Name="ExceptionMessage" ColumnName="ExceptionMessage" />
+                <ScalarProperty Name="GoogleId" ColumnName="GoogleId" />
+                <ScalarProperty Name="EventAppId" ColumnName="EventAppId" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

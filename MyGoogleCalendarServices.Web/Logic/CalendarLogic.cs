@@ -63,34 +63,50 @@
                 LogError(ex, response, eventId, email, StatusCodes.eventForEmailUpdateFailed, "כשל ברישום אירוע לטבלת נמענים");
             }
         }
-        private DataAccess.Event CrateEventLog(Responses.UpdateEvents2Response response, string appId, string summary)
+        private DataAccess.Event CrateEventLog(Responses.UpdateEvents2Response response, UpdateEvents2Request request)
         {
             DataAccess.Event rec1 = null;
             try
             {
-                rec1 = db1.Events.FirstOrDefault(x => x.AppId == appId);
+                rec1 = db1.Events.FirstOrDefault(x => x.AppId == request.AppId);
                 if (rec1 == null)
                 {
                     rec1 = new DataAccess.Event
                     {
-                        AppId = appId,
+                        AppId = request.AppId,
                         CreatedDate = DateTime.Now,
-                        Summary = summary,
+                        Summary = request.EventName,
                         UpdateDate = DateTime.Now,
-                        Status = "crated"
+                        Status = "crated",
+                        ColorId = request.ColorId.Value,
+                        Description = request.Description,
+                        EndTime = request.EndTimeObj,
+                        Location = request.Location,
+                        SoftClientNum = request.SoftClientNum.Value,
+                        SoftDbNum = request.SoftDbNum.Value,
+                        StartTime = request.StartTimeObj
                     };
                     db1.Events.Add(rec1);
                     db1.SaveChanges();
                 }
                 else
                 {
-                    rec1.Summary = summary;
+                    rec1.ColorId = request.ColorId.Value;
+                    rec1.Description = request.Description;
+                    rec1.EndTime = request.EndTimeObj;
+                    rec1.Location = request.Location;
+                    rec1.SoftClientNum = request.SoftClientNum.Value;
+                    rec1.SoftDbNum = request.SoftDbNum.Value;
+                    rec1.StartTime = request.StartTimeObj;
+                    rec1.Status = "updated";
+                    rec1.Summary = request.EventName;
+                    rec1.UpdateDate = DateTime.Now;
                     db1.SaveChanges();
                 }
             }
             catch (Exception ex2)
             {
-                LogError(ex2, response, appId, "", "", "תקלה ברישום או עדכון בדטבייס");
+                LogError(ex2, response, request.AppId, "", "", "תקלה ברישום או עדכון בדטבייס");
                 rec1 = null;
             }
             return rec1;
@@ -100,7 +116,7 @@
             try
             {
                 var cal1 = GoogleCalService.Calendars.Get(email.Email).Execute();
-                Event myEvent = new Event { Summary = request.EventName, Description = request.Description, Location = request.Location, ColorId = request.ColorId };
+                Event myEvent = new Event { Summary = request.EventName, Description = request.Description, Location = request.Location, ColorId = request.ColorId.ToString() };
                 if (request.StartTimeObj == request.EndTimeObj)
                 {
                     myEvent.Start = new EventDateTime() { Date = request.StartTimeObj.Date.ToString("yyyy-MM-dd") };
@@ -241,7 +257,7 @@
                     DeleteEvent(request, response);
                 else
                 {
-                    var eventRec = CrateEventLog(response, request.AppId, request.EventName);
+                    var eventRec = CrateEventLog(response, request);
                     if (eventRec != null) UpdateEvents(request, response, eventRec);
                 }
             }
@@ -256,7 +272,7 @@
                 event1.Description = request.Description;
                 event1.Start = new EventDateTime { DateTime = request.StartTimeObj };
                 event1.End = new EventDateTime { DateTime = request.EndTimeObj };
-                event1.ColorId = request.ColorId;
+                event1.ColorId = request.ColorId.ToString();
                 var result = GoogleCalService.Events.Update(event1, attendeeRec.Email, attendeeRec.GoogleId).Execute();
                 CreateAttendeLog(response, attendeeRec.Email, attendeeRec.GoogleId, attendeeRec.EventAppId);
             }

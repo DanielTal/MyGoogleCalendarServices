@@ -225,6 +225,7 @@
     </Compile>
     <Compile Include="Logic\CalendarLogic.cs" />
     <Compile Include="Logic\CalendarManager.cs" />
+    <Compile Include="Logic\XmlFormatter.cs" />
     <Compile Include="Models\EmailEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Requests\UpdateEvents2Request.cs" />

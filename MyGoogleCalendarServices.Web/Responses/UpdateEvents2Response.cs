@@ -3,16 +3,23 @@
     using Models;
     using System;
     using System.Collections.Generic;
+    using System.Runtime.Serialization;
     using System.Web.Http.ModelBinding;
 
     public class UpdateEvents2Response
     {
+        #region Properties
         public string Status { get; set; }
+
         public string StatusId { get; set; }
-        public List<string> ValidationErrors { get; set; }
-        //public string GoogleId { get; set; }
+
         public string AppId { get; set; }
+
+        public List<string> ValidationErrors { get; set; }
+
         public List<EmailEntry> Results { get; set; }
+        #endregion
+
         public UpdateEvents2Response()
         {
             ValidationErrors = new List<string>();

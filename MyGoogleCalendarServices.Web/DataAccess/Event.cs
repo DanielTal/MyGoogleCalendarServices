@@ -22,9 +22,16 @@ namespace MyGoogleCalendarServices.Web.DataAccess
     
         public string AppId { get; set; }
         public string Summary { get; set; }
+        public string Status { get; set; }
         public System.DateTime CreatedDate { get; set; }
         public System.DateTime UpdateDate { get; set; }
-        public string Status { get; set; }
+        public int SoftClientNum { get; set; }
+        public short SoftDbNum { get; set; }
+        public string Location { get; set; }
+        public string Description { get; set; }
+        public short ColorId { get; set; }
+        public System.DateTime StartTime { get; set; }
+        public System.DateTime EndTime { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<EventsAttendee> EventsAttendees { get; set; }

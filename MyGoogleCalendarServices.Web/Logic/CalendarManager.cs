@@ -186,7 +186,7 @@ namespace MyGoogleCalendarServices.Web.Logic
             try
             {
                 var cal1 = service.Calendars.Get(email.Email).Execute();
-                Event myEvent = new Event { Summary = request.EventName, Description = request.Description, Location = request.Location, ColorId = request.ColorId };
+                Event myEvent = new Event { Summary = request.EventName, Description = request.Description, Location = request.Location, ColorId = request.ColorId.ToString() };
                 if (request.StartTimeObj == request.EndTimeObj)
                 {
                     myEvent.Start = new EventDateTime() { Date = request.StartTimeObj.Date.ToString("yyyy-MM-dd") };
@@ -288,7 +288,7 @@ namespace MyGoogleCalendarServices.Web.Logic
                 event1.Description = request.Description;
                 event1.Start = new EventDateTime { DateTime = request.StartTimeObj };
                 event1.End = new EventDateTime { DateTime = request.EndTimeObj };
-                event1.ColorId = request.ColorId;
+                event1.ColorId = request.ColorId.ToString();
                 var result = service.Events.Update(event1, attendeeRec.Email, attendeeRec.GoogleId).Execute();
                 response.Results.Add(new EmailEntry { StatusId = "update", Email = attendeeRec.Email, Status = "אירוע עודכן בהצלחה" });
             }

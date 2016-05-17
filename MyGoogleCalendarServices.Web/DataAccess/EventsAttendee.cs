@@ -14,13 +14,13 @@ namespace MyGoogleCalendarServices.Web.DataAccess
     
     public partial class EventsAttendee
     {
-        public long Id { get; set; }
+        public int Id { get; set; }
         public string EventAppId { get; set; }
         public string GoogleId { get; set; }
         public string Email { get; set; }
+        public string Status { get; set; }
         public System.DateTime CreateDate { get; set; }
         public System.DateTime UpdateDate { get; set; }
-        public string Status { get; set; }
     
         public virtual Event Event { get; set; }
     }

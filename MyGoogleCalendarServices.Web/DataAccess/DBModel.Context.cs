@@ -25,8 +25,8 @@ namespace MyGoogleCalendarServices.Web.DataAccess
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<ErrorLog> ErrorLogs { get; set; }
         public virtual DbSet<Event> Events { get; set; }
         public virtual DbSet<EventsAttendee> EventsAttendees { get; set; }
-        public virtual DbSet<ErrorLog> ErrorLogs { get; set; }
     }
 }
