@@ -212,7 +212,7 @@
                 {
                     var path1 = System.Configuration.ConfigurationManager.AppSettings["google_key_file"];
                     var keyFile = System.IO.File.ReadAllBytes(path1);
-                    var certificate = new X509Certificate2(keyFile, "notasecret", X509KeyStorageFlags.Exportable);
+                    var certificate = new X509Certificate2(keyFile, "notasecret", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet);
                     var ServiceAccountCredentialInitializer = new ServiceAccountCredential.Initializer("serviceaccount01@softegg-eruim-services.iam.gserviceaccount.com");
                     ServiceAccountCredentialInitializer.Scopes = new string[] { CalendarService.Scope.Calendar };
                     var credential = new ServiceAccountCredential(ServiceAccountCredentialInitializer.FromCertificate(certificate));
