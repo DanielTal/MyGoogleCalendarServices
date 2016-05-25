@@ -40,7 +40,7 @@
                     rec1.UpdateDate = DateTime.Now;
                     rec1.Status = StatusCodes.eventForEmailUpdatedSuccessfully;
                     db1.SaveChanges();
-                    response.Results.Add(new EmailEntry { StatusId = StatusCodes.eventForEmailUpdatedSuccessfully, Email = email, Status = "אירוע עודכן בהצלחה" });
+                    response.Results.Add(new EmailEntry { EmailStatusId = StatusCodes.eventForEmailUpdatedSuccessfully, Email = email, EmailSuccess = "ok" });
                 }
                 else
                 {
@@ -55,7 +55,7 @@
                     };
                     db1.EventsAttendees.Add(rec1);
                     db1.SaveChanges();
-                    response.Results.Add(new EmailEntry { StatusId = StatusCodes.eventForEmailCreatedSuccessfully, Email = email, Status = "אירוע נוצר בהצלחה" });
+                    response.Results.Add(new EmailEntry { EmailStatusId = StatusCodes.eventForEmailCreatedSuccessfully, Email = email, EmailSuccess = "ok" });
                 }
             }
             catch(Exception ex)
@@ -132,7 +132,7 @@
             }
             catch (Exception ex)
             {
-                LogError(ex, response, eventRec.AppId, email.Email, StatusCodes.eventForEmailCreatedFailed, "תקלה ביצירת אירוע");
+                LogError(ex, response, eventRec.AppId, email.Email, StatusCodes.eventForEmailCreatedFailed, "Error");
             }
         }
         private void DeleteEvent(UpdateEvents2Request request, UpdateEvents2Response response)
@@ -158,18 +158,50 @@
                 LogError(ex, response, request.AppId, "", "", "תקלה במחיקת אירוע");
             }
         }
-        private void DeleteSingleEvent(UpdateEvents2Request request, UpdateEvents2Response response, DataAccess.EventsAttendee attendee)
+
+        private void DeleteSingleEvent(UpdateEvents2Request request, UpdateEvents2Response response, DataAccess.EventsAttendee attendee, System.Net.HttpStatusCode HttpStatusCode)
         {
             try
             {
-                var deletedEvent = GoogleCalService.Events.Delete(attendee.Email, attendee.GoogleId).Execute();
-                db1.EventsAttendees.Remove(attendee);
-                db1.SaveChanges();
-                response.Results.Add(new EmailEntry { StatusId = StatusCodes.eventForEmailDeletedSuccessfully, Email = attendee.Email, Status = "אירוע נמחק בהצלחה" });
+                switch (HttpStatusCode)
+                {
+                    case System.Net.HttpStatusCode.OK:
+                        db1.EventsAttendees.Remove(attendee);
+                        db1.SaveChanges();
+                        response.Results.Add(new EmailEntry { EmailStatusId = StatusCodes.eventForEmailDeletedSuccessfully, Email = attendee.Email, EmailSuccess = "ok" });
+                        break;
+                    case System.Net.HttpStatusCode.Gone:
+                        db1.EventsAttendees.Remove(attendee);
+                        db1.SaveChanges();
+                        response.Results.Add(new EmailEntry { EmailStatusId = StatusCodes.eventForEmailDeleteFailed, Email = attendee.Email, EmailSuccess = "ok" });
+                        break;
+                    default:
+                        response.Results.Add(new EmailEntry { EmailStatusId = StatusCodes.eventForEmailDeleteFailed, Email = attendee.Email, EmailSuccess = "Error" });
+                        break;
+                }
             }
-            catch (Exception ex)
+            catch
             {
-                LogError(ex, response, attendee.EventAppId, attendee.Email, StatusCodes.eventForEmailDeleteFailed, "כשל במחיקת אירוע, ייתכן שהאירוע נמחק כבר על ידי המשתמש");
+            }
+        }
+        private void DeleteSingleEvent(UpdateEvents2Request request, UpdateEvents2Response response, DataAccess.EventsAttendee attendee)
+        {
+            System.Net.HttpStatusCode HttpStatusCode = System.Net.HttpStatusCode.OK;
+            try
+            {
+                var deletedEvent = GoogleCalService.Events.Delete(attendee.Email, attendee.GoogleId).Execute();
+            }
+            catch (Google.GoogleApiException ex1)
+            {
+                HttpStatusCode = ex1.HttpStatusCode;
+            }
+            catch
+            {
+                HttpStatusCode = System.Net.HttpStatusCode.InternalServerError;
+            }
+            finally
+            {
+                DeleteSingleEvent(request, response, attendee, HttpStatusCode);
             }
         }
         private bool IntializeGoogeService(UpdateEvents2Response response)
@@ -208,8 +240,8 @@
                     var emailResult = new EmailEntry
                     {
                         Email = email,
-                        Status = message,
-                        StatusId = action
+                        EmailSuccess = message,
+                        EmailStatusId = action
                     };
                     respponse.Results.Add(emailResult);
                 }
@@ -267,6 +299,8 @@
             try
             {
                 var event1 = GoogleCalService.Events.Get(attendeeRec.Email, attendeeRec.GoogleId).Execute();
+                if (event1.Status == "cancelled")
+                    event1.Status = "confirmed";
                 event1.Summary = request.EventName;
                 event1.Location = request.Location;
                 event1.Description = request.Description;
@@ -286,14 +320,14 @@
         {
             UpdateEvents2Response response = new UpdateEvents2Response();
             if (request == null)
-                response.SetFailed(StatusCodes.requestMissing, "פרמטר בקשה לא נשלח עם הבקשה");
+                response.SetFailed(StatusCodes.requestMissing, "Error");
             else
             {
                 response.AppId = request.AppId;
                 if (ModelState.IsValid)
                     UpdateEvents(request, response);
                 else
-                    response.SetFailed(StatusCodes.validationErrors, "שגיאות וולידציה", ModelState);
+                    response.SetFailed(StatusCodes.validationErrors, "Error", ModelState);
             }
             return response;
         }

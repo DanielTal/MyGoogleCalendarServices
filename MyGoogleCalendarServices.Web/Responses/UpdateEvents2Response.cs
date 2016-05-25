@@ -6,26 +6,30 @@
     using System.Runtime.Serialization;
     using System.Web.Http.ModelBinding;
 
+    public class ValidationError
+    {
+        public string Error { get; set; }
+    }
+
+
     public class UpdateEvents2Response
     {
         #region Properties
-        public string Status { get; set; }
-
-        public string StatusId { get; set; }
-
         public string AppId { get; set; }
-
-        public List<string> ValidationErrors { get; set; }
-
+        public string Success { get; set; }
+        public string StatusId { get; set; }
+        //public List<string> ValidationErrors { get; set; }
+        public List<ValidationError> ValidationErrors { get; set; }
         public List<EmailEntry> Results { get; set; }
         #endregion
 
         public UpdateEvents2Response()
         {
-            ValidationErrors = new List<string>();
+            //ValidationErrors = new List<string>();
+            ValidationErrors = new List<ValidationError>();
             Results = new List<EmailEntry>();
             this.AppId = string.Empty;
-            this.Status = "לא נמצאו תקלות, יש לבדוק סטאטוס ברמת נמענים";
+            this.Success = "ok";
             this.StatusId = StatusCodes.noErrors;
         }
         private void WriteException(object ex)
@@ -61,19 +65,20 @@
         }
         internal void SetFailed(string statusCode, string message, ModelStateDictionary modelState = null, Exception ex = null)
         {
-            Status = message;
+            Success = message;
             StatusId = statusCode;
             if (modelState == null) return;
             foreach (var item in modelState)
             {
                 foreach (var errorMessage in item.Value.Errors)
                 {
-                    ValidationErrors.Add(string.Format("{0} : {1}", item.Key, errorMessage.ErrorMessage));
+                    var s1 = string.Format("{0} : {1}", item.Key, errorMessage.ErrorMessage);
+                    //ValidationErrors.Add(s1);
+                    ValidationErrors.Add(new ValidationError { Error = s1 });
                 }
             }
             if (ex != null)
             {
-                this.Status += Environment.NewLine + ex.Message;
                 System.Threading.Tasks.Task.Factory.StartNew(WriteException, ex);
             }
         }
