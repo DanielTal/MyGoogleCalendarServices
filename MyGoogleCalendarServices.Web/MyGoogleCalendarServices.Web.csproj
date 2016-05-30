@@ -224,7 +224,6 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Logic\CalendarLogic.cs" />
-    <Compile Include="Logic\CalendarManager.cs" />
     <Compile Include="Logic\XmlFormatter.cs" />
     <Compile Include="Models\EmailEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

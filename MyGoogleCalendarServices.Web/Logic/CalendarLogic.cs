@@ -60,7 +60,7 @@
             }
             catch(Exception ex)
             {
-                LogError(ex, response, eventId, email, StatusCodes.eventForEmailUpdateFailed, "כשל ברישום אירוע לטבלת נמענים");
+                LogError(ex, response, eventId, email, StatusCodes.eventForEmailUpdateFailed, "Error");
             }
         }
         private DataAccess.Event CrateEventLog(Responses.UpdateEvents2Response response, UpdateEvents2Request request)
@@ -106,7 +106,7 @@
             }
             catch (Exception ex2)
             {
-                LogError(ex2, response, request.AppId, "", "", "תקלה ברישום או עדכון בדטבייס");
+                LogError(ex2, response, request.AppId, "", "", "Error");
                 rec1 = null;
             }
             return rec1;
@@ -141,7 +141,7 @@
             {
                 var eventRec1 = db1.Events.FirstOrDefault(x => x.AppId == request.AppId);
                 if (eventRec1 == null)
-                    response.SetFailed(StatusCodes.eventIdNotFound, "לא נמצא אירוע");
+                    response.SetFailed(StatusCodes.eventIdNotFound, "Error");
                 else
                 {
                     var itemsForDelete = eventRec1.EventsAttendees.ToArray();
@@ -155,7 +155,7 @@
             }
             catch (Exception ex)
             {
-                LogError(ex, response, request.AppId, "", "", "תקלה במחיקת אירוע");
+                LogError(ex, response, request.AppId, "", "", "Error");
             }
         }
 
@@ -225,22 +225,22 @@
             }
             catch(Exception ex)
             {
-                LogError(ex, response, "", "", "", "כשל באתחול שירות גוגל");
+                LogError(ex, response, "", "", "", "Error");
             }
             return GoogleCalService != null;
         }
-        private void LogError(Exception ex = null, UpdateEvents2Response respponse = null, string appId = "", string email = "", string action = "", string message = "")
+        private void LogError(Exception ex = null, UpdateEvents2Response respponse = null, string appId = "", string email = "", string action = "", string success = "")
         {
             if (respponse != null)
             {
                 if (string.IsNullOrEmpty(email))
-                    respponse.SetFailed(StatusCodes.unhandlesException, message);
+                    respponse.SetFailed(StatusCodes.unhandlesException, success);
                 else
                 {
                     var emailResult = new EmailEntry
                     {
                         Email = email,
-                        EmailSuccess = message,
+                        EmailSuccess = success,
                         EmailStatusId = action
                     };
                     respponse.Results.Add(emailResult);
@@ -252,7 +252,7 @@
                 {
                     CreateDate = DateTime.Now,
                     ExceptionMessage = ex.ToString(),
-                    Info = message,
+                    Info = success,
                     AppId = appId,
                     email = email
                 };
@@ -312,7 +312,7 @@
             }
             catch (Exception ex)
             {
-                LogError(ex, response, attendeeRec.EventAppId, attendeeRec.Email, StatusCodes.eventForEmailUpdateFailed, "כשל בעדכון אירוע לנמען");
+                LogError(ex, response, attendeeRec.EventAppId, attendeeRec.Email, StatusCodes.eventForEmailUpdateFailed, "Error");
             }
         }
         #endregion

@@ -63,9 +63,9 @@
         {
             SetFailed(statusCode, message, null, null);
         }
-        internal void SetFailed(string statusCode, string message, ModelStateDictionary modelState = null, Exception ex = null)
+        internal void SetFailed(string statusCode, string success, ModelStateDictionary modelState = null, Exception ex = null)
         {
-            Success = message;
+            Success = success;
             StatusId = statusCode;
             if (modelState == null) return;
             foreach (var item in modelState)
